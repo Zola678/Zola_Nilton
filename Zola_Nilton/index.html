@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zola & Nilton | Portfolio</title>
+
+<style>
+/* RESET */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+body {
+    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+    color: white;
+    overflow-x: hidden;
+}
+
+/* NAVBAR */
+nav {
+    position: fixed;
+    width: 100%;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    background: rgba(0,0,0,0.4);
+    backdrop-filter: blur(10px);
+    z-index: 1000;
+}
+
+nav h1 {
+    font-size: 20px;
+    letter-spacing: 2px;
+}
+
+nav ul {
+    display: flex;
+    list-style: none;
+    gap: 20px;
+}
+
+nav ul li {
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+nav ul li:hover {
+    color: #00e0ff;
+}
+
+/* HERO */
+.hero {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;    
+}
+
+.hero h2 {
+    font-size: 50px;
+    animation: fadeIn 2s ease-in-out;
+}
+
+.hero span {
+    color: #00e0ff;
+}
+
+.hero p {
+    margin-top: 20px;
+    width: 60%;
+    opacity: 0.8;
+}
+
+/* SECTION */
+section {
+    padding: 100px 10%;
+}
+
+.section-title {
+    font-size: 32px;
+    margin-bottom: 40px;
+    border-left: 5px solid #00e0ff;
+    padding-left: 15px;
+}
+
+/* CARDS */
+.cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
+}
+
+.card {
+    background: rgba(255,255,255,0.05);
+    padding: 25px;
+    border-radius: 15px;
+    backdrop-filter: blur(10px);
+    transition: 0.4s;
+}
+
+.card:hover {
+    transform: translateY(-10px);
+    background: rgba(0,224,255,0.1);
+}
+
+/* FOOTER */
+footer {
+    text-align: center;
+    padding: 30px;
+    background: rgba(0,0,0,0.5);
+}
+
+/* ANIMAÇÃO */
+@keyframes fadeIn {
+    from {opacity: 0; transform: translateY(30px);}
+    to {opacity: 1; transform: translateY(0);}
+}
+
+/* BOTÃO */
+button {
+    margin-top: 30px;
+    padding: 12px 25px;
+    border: none;
+    background: #00e0ff;
+    color: black;
+    font-weight: bold;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+button:hover {
+    background: white;
+}
+</style>
+</head>
+
+<body>
+
+<nav>
+    <h1>ZOLA & NILTON</h1>
+    <ul>
+        <li onclick="scrollToSection('sobre')">Sobre</li>
+        <li onclick="scrollToSection('escola')">ITEL</li>
+        <li onclick="scrollToSection('luta')">Nossa Jornada</li>
+    </ul>
+</nav>
+
+<div class="hero">
+    <h2>Estamos a criar o <span>RYPE</span></h2>
+    <p>Somos Zola e Nilton, estudantes de Multimédia determinados a transformar desafios em oportunidades através da tecnologia e criatividade.</p>
+    <button onclick="mostrarMensagem()">Descubra Nossa História</button>
+</div>
+
+<section id="sobre">
+    <h3 class="section-title">Quem Somos</h3>
+    <div class="cards">
+        <div class="card">
+            <h4>Zola</h4>
+            <p>Visionário, criador tech, apaixonado por programação, inovação e empreendedorismo digital.</p>
+        </div>
+        <div class="card">
+            <h4>Nilton</h4>
+            <p>Determinado, criativo e focado em transformar ideias em projetos reais através do design e código.</p>
+        </div>
+        <div class="card">
+            <h4>RYPE</h4>
+            <p>Nosso projeto de portfólio colaborativo, representando crescimento, resiliência e evolução.</p>
+        </div>
+    </div>
+</section>
+
+<section id="escola">
+    <h3 class="section-title">Sobre o ITEL</h3>
+    <div class="card">
+        <p>
+            Estudamos no ITEL, onde enfrentamos desafios reais: pressão acadêmica, dificuldades técnicas e limitações de recursos.
+            Mas cada obstáculo fortaleceu nossa mentalidade. Estamos a aprender não apenas tecnologia,
+            mas disciplina, resiliência e visão estratégica.
+        </p>
+    </div>
+</section>
+
+<section id="luta">
+    <h3 class="section-title">Nossa Jornada</h3>
+    <div class="cards">
+        <div class="card">
+            <h4>Dificuldades</h4>
+            <p>Noites sem dormir, erros no código, dúvidas, críticas e momentos de desmotivação.</p>
+        </div>
+        <div class="card">
+            <h4>Superação</h4>
+            <p>Persistência, estudo constante, prática e foco no nosso sonho de crescer no mundo da tecnologia.</p>
+        </div>
+        <div class="card">
+            <h4>Objetivo</h4>
+            <p>Construir um portfólio forte, criar impacto e mostrar que estudantes angolanos podem liderar inovação.</p>
+        </div>
+    </div>
+</section>
+
+<footer>
+    © 2026 Zola & Nilton | Criando o Futuro com Código
+</footer>
+
+<script>
+function scrollToSection(id) {
+    document.getElementById(id).scrollIntoView({behavior: "smooth"});
+}
+
+function mostrarMensagem() {
+    alert("Nós não somos definidos pelas dificuldades do ITEL. Somos definidos pela nossa capacidade de superá-las.");
+}
+</script>
+
+</body>
+</html>
