@@ -3,6 +3,9 @@
 @section('content')
 
 <h2>🗑️ Trash</h2>
+<a href="{{ route('students.index') }}" class="btn btn-primary" style="margin-bottom: 20px;">
+    &larr; Voltar para a lista de estudantes
+</a>
 
 @foreach($students as $s)
     <div class="card p-3 mb-2">
