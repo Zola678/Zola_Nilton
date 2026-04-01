@@ -21,11 +21,12 @@
             <div class="invalid-feedback">{{ $message }}</div>
         @enderror
 
-        <!-- Course -->
-        <input type="text" name="course" value="{{ old('course', $student->course) }}" class="form-control mb-2 @error('course') is-invalid @enderror" required>
-        @error('course')
-            <div class="invalid-feedback">{{ $message }}</div>
-        @enderror
+       <select name="course" class="form-control mb-2" required>
+            <option value="">Select Course</option>
+            <option value="Electrônica e Telecomunições" {{ (old('course', $student->course ?? '') == 'Electronica e Telecomunicacoes') ? 'selected' : '' }}>Electronica e Telecomunicacoes</option>
+            <option value="Informática" {{ (old('course', $student->course ?? '') == 'Informatica') ? 'selected' : '' }}>Informatica</option>
+            <option value="Informática e Sistemas Multimídia" {{ (old('course', $student->course ?? '') == 'Informatica e Sistemas Multimedia') ? 'selected' : '' }}>Informatica e Sistemas Multimedia</option>
+        </select>
 
         <!-- Phone -->
         <input type="text" name="phone" value="{{ old('phone', $student->phone) }}" class="form-control mb-2 @error('phone') is-invalid @enderror">
