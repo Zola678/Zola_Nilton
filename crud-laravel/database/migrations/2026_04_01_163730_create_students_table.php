@@ -9,27 +9,22 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-   public function up(): void
+  public function up(): void
 {
-    Schema::create('students', function (Blueprint $table) {
-        $table->id();
-        $table->string('name');
-        $table->string('email')->unique();
-        $table->string('course');
-        $table->string('phone')->nullable();
-        $table->date('birth_date')->nullable();
-        $table->timestamps();
-        $table->softDeletes(); // 🗑️ Lixeira
-        $table->string('photo')->nullable();
+    Schema::table('students', function (Blueprint $table) {
+        $table->foreignId('course_id')->nullable()->constrained()->onDelete('cascade');
+        
+        // opcional: remover campo antigo
+        $table->dropColumn('course');
     });
-    
 }
 
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
-    {
-        Schema::dropIfExists('students');
-    }
+public function down(): void
+{
+    Schema::table('students', function (Blueprint $table) {
+        $table->string('course')->nullable();
+        $table->dropForeign(['course_id']);
+        $table->dropColumn('course_id');
+    });
+}
 };

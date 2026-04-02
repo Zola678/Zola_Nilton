@@ -30,77 +30,57 @@ class StudentController extends Controller
         return view('students.edit', compact('student', 'courses'));
     }
 
-    // Armazena um estudante novo com validação completa
-    public function store(Request $request)
-    {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:students,email',
-            'course_id' => 'required|exists:courses,id',
-            'phone' => 'required|numeric|digits_between:8,15',
-            'birth_date' => 'required|date|before:today|after:1900-01-01',
-            'photo' => 'nullable|image|max:2048', // imagem até 2MB
-        ], [
-            'name.required' => 'O nome é obrigatório.',
-            'name.string' => 'O nome deve conter apenas letras.',
-            'name.max' => 'O nome não pode ter mais de 255 caracteres.',
-            'email.required' => 'O email é obrigatório.',
-            'email.email' => 'Digite um email válido (ex: exemplo@dominio.com).',
-            'email.unique' => 'Este email já está cadastrado.',
-            'course_id.required' => 'O curso é obrigatório.',
-            'course_id.exists' => 'Curso selecionado inválido.',
-            'phone.required' => 'O telefone é obrigatório.',
-            'phone.numeric' => 'O telefone deve conter apenas números.',
-            'phone.digits_between' => 'O telefone deve ter entre 8 e 15 dígitos.',
-            'birth_date.required' => 'A data de nascimento é obrigatória.',
-            'birth_date.date' => 'Insira uma data válida.',
-            'birth_date.before' => 'A data de nascimento deve ser anterior a hoje.',
-            'birth_date.after' => 'A data de nascimento não pode ser anterior a 1900.',
-            'photo.image' => 'O arquivo deve ser uma imagem.',
-            'photo.max' => 'A imagem não pode ultrapassar 2MB.',
-        ]);
+ public function store(Request $request)
+{
+    $data = $request->validate([
+        'name' => 'required|string|max:255',
+        'email' => 'required|email|unique:students,email',
+        'course' => 'required|string',
+        'phone' => 'nullable|string',
+        'birth_date' => 'nullable|date',
+        'photo' => 'nullable|image|max:2048',
+    ]);
 
-        $data = $request->all();
-
-        // Upload da foto
-        if ($request->hasFile('photo')) {
-            $data['photo'] = $request->file('photo')->store('students', 'public');
-        }
-
-        Student::create($data);
-
-        return redirect()->route('students.index')
-            ->with('success', 'Estudante cadastrado com sucesso!');
+    // Upload da foto
+    if ($request->hasFile('photo')) {
+        $data['photo'] = $request->file('photo')->store('students', 'public');
     }
 
-    // Atualiza estudante com validação completa
-    public function update(Request $request, Student $student)
-    {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:students,email,' . $student->id,
-            'course_id' => 'required|exists:courses,id',
-            'phone' => 'required|numeric|digits_between:8,15',
-            'birth_date' => 'required|date|before:today|after:1900-01-01',
-            'photo' => 'nullable|image|max:2048',
-        ]);
+    Student::create($data);
 
-        $data = $request->all();
+    return redirect()->route('students.index')
+        ->with('success', 'Estudante criado com sucesso!');
+}
 
-        // Upload da foto
-        if ($request->hasFile('photo')) {
-            // Remove foto antiga
-            if ($student->photo) {
-                Storage::disk('public')->delete($student->photo);
-            }
-            $data['photo'] = $request->file('photo')->store('students', 'public');
+public function update(Request $request, Student $student)
+{
+    $request->validate([
+        'name' => 'required|string|max:255',
+        'email' => 'required|email|unique:students,email,' . $student->id,
+        'course' => 'required|string|in:Electrônica e Telecomunicações,Informática,Informática e Sistemas Multimídia',
+        'phone' => 'required|numeric|digits_between:9,15',
+        'birth_date' => 'required|date|before:today|after:1900-01-01',
+        'photo' => 'nullable|image|max:2048',
+    ], [
+        'course.in' => 'Selecione um curso válido.',
+    ]);
+
+    $data = $request->only(['name', 'email', 'course', 'phone', 'birth_date']);
+
+    // Upload da foto
+    if ($request->hasFile('photo')) {
+        // Remove foto antiga se existir
+        if ($student->photo) {
+            Storage::disk('public')->delete($student->photo);
         }
-
-        $student->update($data);
-
-        return redirect()->route('students.index')
-            ->with('success', 'Estudante atualizado com sucesso!');
+        $data['photo'] = $request->file('photo')->store('students', 'public');
     }
+
+    $student->update($data);
+
+    return redirect()->route('students.index')
+        ->with('success', 'Estudante atualizado com sucesso!');
+}
 
     // Move para lixeira (soft delete)
     public function destroy(Student $student)

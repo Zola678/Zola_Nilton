@@ -5,7 +5,6 @@
 
     <h2>Edit Student</h2>
 
-    <!-- Adicionamos enctype para upload de imagem -->
     <form method="POST" action="{{ route('students.update', $student) }}" enctype="multipart/form-data">
         @csrf
         @method('PUT')
@@ -24,14 +23,25 @@
             <div class="invalid-feedback">{{ $message }}</div>
         @enderror
 
-        <!-- Course Select -->
+        <!-- Course -->
+        @php
+            $courses = [
+                'Electrônica e Telecomunicações',
+                'Informática',
+                'Informática e Sistemas Multimídia'
+            ];
+            $selected = old('course', $student->course ?? '');
+        @endphp
+
         <select name="course" class="form-control mb-2 @error('course') is-invalid @enderror" required>
             <option value="">Select Course</option>
-            <option value="Electronica e Telecomunicacoes" {{ old('course', $student->course) == 'Electronica e Telecomunicacoes' ? 'selected' : '' }}>Electronica e Telecomunicacoes</option>
-            <option value="Informatica" {{ old('course', $student->course) == 'Informatica' ? 'selected' : '' }}>Informatica</option>
-            <option value="Informatica e Sistemas Multimedia" {{ old('course', $student->course) == 'Informatica e Sistemas Multimedia' ? 'selected' : '' }}>Informatica e Sistemas Multimedia</option>
+            @foreach($courses as $course)
+                <option value="{{ $course }}" {{ $selected == $course ? 'selected' : '' }}>
+                    {{ $course }}
+                </option>
+            @endforeach
         </select>
-        
+
         @error('course')
             <div class="invalid-feedback">{{ $message }}</div>
         @enderror
@@ -43,8 +53,10 @@
             <div class="invalid-feedback">{{ $message }}</div>
         @enderror
 
-        <!-- Birth Date -->
-        <input type="date" name="birth_date" value="{{ old('birth_date', $student->birth_date?->format('Y-m-d')) }}" 
+        <!-- Birth Date (CORRIGIDO) -->
+        <input type="date" 
+               name="birth_date" 
+               value="{{ old('birth_date', $student->birth_date ? date('Y-m-d', strtotime($student->birth_date)) : '') }}" 
                class="form-control mb-2 @error('birth_date') is-invalid @enderror">
         @error('birth_date')
             <div class="invalid-feedback">{{ $message }}</div>
@@ -56,9 +68,12 @@
             <div class="invalid-feedback">{{ $message }}</div>
         @enderror
 
-        <!-- Mostrar imagem atual -->
+        <!-- Mostrar imagem atual (CORRIGIDO) -->
         @if(!empty($student->photo))
-            <img src="{{ asset('storage/students/'.$student->photo) }}" alt="Student Photo" width="100" class="mb-2">
+            <img src="{{ asset('storage/' . $student->photo) }}" 
+                 alt="Student Photo" 
+                 width="100" 
+                 class="mb-2">
         @endif
 
         <button type="submit" class="btn btn-success">Update</button>

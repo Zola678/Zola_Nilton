@@ -2,12 +2,11 @@
 
 @section('content')
 <div class="container">
-    <h2 class="my-4">{{ $student->id ?? '' ? 'Edit Student' : 'Add Student' }}</h2>
+    <h2 class="my-4">{{ isset($student) ? 'Edit Student' : 'Add Student' }}</h2>
 
-    <!-- Adicionamos enctype para upload de imagem -->
-    <form method="POST" action="{{ $student->id ?? '' ? route('students.update', $student) : route('students.store') }}" enctype="multipart/form-data">
+    <form method="POST" action="{{ isset($student) ? route('students.update', $student) : route('students.store') }}" enctype="multipart/form-data">
         @csrf
-        @if($student->id ?? false)
+        @if(isset($student))
             @method('PUT')
         @endif
 
@@ -25,25 +24,28 @@
             <div class="invalid-feedback">{{ $message }}</div>
         @enderror
 
-        <!-- Course Select -->
+        <!-- Course (SIMPLIFICADO E CORRETO) -->
+        @php
+            $courses = [
+                'Electrônica e Telecomunicações',
+                'Informática',
+                'Informática e Sistemas Multimídia'
+            ];
+            $selected = old('course', $student->course ?? '');
+        @endphp
+
         <select name="course" class="form-control mb-2 @error('course') is-invalid @enderror" required>
             <option value="">Select Course</option>
-            <option value="Electronica e Telecomunicacoes" {{ old('course', $student->course ?? '') == 'Electronica e Telecomunicacoes' ? 'selected' : '' }}>Electronica e Telecomunicacoes</option>
-            <option value="Informatica" {{ old('course', $student->course ?? '') == 'Informatica' ? 'selected' : '' }}>Informatica</option>
-            <option value="Informatica e Sistemas Multimedia" {{ old('course', $student->course ?? '') == 'Informatica e Sistemas Multimedia' ? 'selected' : '' }}>Informatica e Sistemas Multimedia</option>
+            @foreach($courses as $course)
+                <option value="{{ $course }}" {{ $selected == $course ? 'selected' : '' }}>
+                    {{ $course }}
+                </option>
+            @endforeach
         </select>
+
         @error('course')
             <div class="invalid-feedback">{{ $message }}</div>
         @enderror
-
-        <select name="course_id" class="form-control mb-2" required>
-    <option value="">Select Course</option>
-    @foreach($courses as $course)
-        <option value="{{ $course->id }}" {{ old('course_id') == $course->id ? 'selected' : '' }}>
-            {{ $course->name }}
-        </option>
-    @endforeach
-</select>
 
         <!-- Phone -->
         <input type="text" name="phone" value="{{ old('phone', $student->phone ?? '') }}" 
@@ -52,8 +54,10 @@
             <div class="invalid-feedback">{{ $message }}</div>
         @enderror
 
-        <!-- Birth Date -->
-        <input type="date" name="birth_date" value="{{ old('birth_date', $student->birth_date ?? '') }}" 
+        <!-- Birth Date (CORRIGIDO) -->
+        <input type="date" 
+               name="birth_date" 
+               value="{{ old('birth_date', isset($student->birth_date) ? date('Y-m-d', strtotime($student->birth_date)) : '') }}" 
                class="form-control mb-2 @error('birth_date') is-invalid @enderror">
         @error('birth_date')
             <div class="invalid-feedback">{{ $message }}</div>
@@ -65,12 +69,18 @@
             <div class="invalid-feedback">{{ $message }}</div>
         @enderror
 
-        <!-- Mostrar imagem atual se existir -->
+        <!-- Mostrar imagem atual -->
         @if(!empty($student->photo))
-            <img src="{{ asset('storage/students/'.$student->photo) }}" alt="Student Photo" width="100" class="mb-2">
+            <img src="{{ asset('storage/' . $student->photo) }}" 
+                 alt="Student Photo" 
+                 width="100" 
+                 class="mb-2">
         @endif
 
-        <button type="submit" class="btn btn-success">{{ $student->id ?? '' ? 'Update' : 'Save' }}</button>
+        <button type="submit" class="btn btn-success">
+            {{ isset($student) ? 'Update' : 'Save' }}
+        </button>
+
         <a href="{{ route('students.index') }}" class="btn btn-secondary">Back</a>
     </form>
 </div>
