@@ -15,12 +15,16 @@ class Student extends Model
         'email',
         'phone',
         'birth_date',
-        'course_id', // agora é course_id
+        'course_id',
+        'photo'
     ];
 
-    protected $dates = ['deleted_at' , 'birth_date'];
+    // transforma birth_date em Carbon automaticamente
+    protected $casts = [
+        'birth_date' => 'datetime',
+    ];
 
-    // Relacionamento
+    // Relacionamento com course
     public function course()
     {
         return $this->belongsTo(Course::class);
