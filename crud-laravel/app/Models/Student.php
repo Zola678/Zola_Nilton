@@ -13,14 +13,16 @@ class Student extends Model
     protected $fillable = [
         'name',
         'email',
-        'course',
         'phone',
-        'birth_date'
+        'birth_date',
+        'course_id', // agora é course_id
     ];
 
-    protected $dates = ['deleted_at'];
+    protected $dates = ['deleted_at' , 'birth_date'];
 
-    protected $casts = [
-        'birth_date' => 'date',
-    ];
+    // Relacionamento
+    public function course()
+    {
+        return $this->belongsTo(Course::class);
+    }
 }

@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Student;
+use App\Models\Course;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class StudentController extends Controller
 {
@@ -17,7 +19,15 @@ class StudentController extends Controller
     // Formulário de criação
     public function create()
     {
-        return view('students.create');
+        $courses = Course::all();
+        return view('students.create', compact('courses'));
+    }
+
+    // Formulário de edição
+    public function edit(Student $student)
+    {
+        $courses = Course::all();
+        return view('students.edit', compact('student', 'courses'));
     }
 
     // Armazena um estudante novo com validação completa
@@ -26,9 +36,10 @@ class StudentController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:students,email',
-            'course' => 'required|string|max:255',
+            'course_id' => 'required|exists:courses,id',
             'phone' => 'required|numeric|digits_between:8,15',
             'birth_date' => 'required|date|before:today|after:1900-01-01',
+            'photo' => 'nullable|image|max:2048', // imagem até 2MB
         ], [
             'name.required' => 'O nome é obrigatório.',
             'name.string' => 'O nome deve conter apenas letras.',
@@ -36,9 +47,8 @@ class StudentController extends Controller
             'email.required' => 'O email é obrigatório.',
             'email.email' => 'Digite um email válido (ex: exemplo@dominio.com).',
             'email.unique' => 'Este email já está cadastrado.',
-            'course.required' => 'O curso é obrigatório.',
-            'course.string' => 'O curso deve conter apenas texto.',
-            'course.max' => 'O curso não pode ter mais de 255 caracteres.',
+            'course_id.required' => 'O curso é obrigatório.',
+            'course_id.exists' => 'Curso selecionado inválido.',
             'phone.required' => 'O telefone é obrigatório.',
             'phone.numeric' => 'O telefone deve conter apenas números.',
             'phone.digits_between' => 'O telefone deve ter entre 8 e 15 dígitos.',
@@ -46,18 +56,21 @@ class StudentController extends Controller
             'birth_date.date' => 'Insira uma data válida.',
             'birth_date.before' => 'A data de nascimento deve ser anterior a hoje.',
             'birth_date.after' => 'A data de nascimento não pode ser anterior a 1900.',
+            'photo.image' => 'O arquivo deve ser uma imagem.',
+            'photo.max' => 'A imagem não pode ultrapassar 2MB.',
         ]);
 
-        Student::create($request->all());
+        $data = $request->all();
+
+        // Upload da foto
+        if ($request->hasFile('photo')) {
+            $data['photo'] = $request->file('photo')->store('students', 'public');
+        }
+
+        Student::create($data);
 
         return redirect()->route('students.index')
             ->with('success', 'Estudante cadastrado com sucesso!');
-    }
-
-    // Formulário de edição
-    public function edit(Student $student)
-    {
-        return view('students.edit', compact('student'));
     }
 
     // Atualiza estudante com validação completa
@@ -66,12 +79,24 @@ class StudentController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:students,email,' . $student->id,
-            'course' => 'required|string|max:255',
+            'course_id' => 'required|exists:courses,id',
             'phone' => 'required|numeric|digits_between:8,15',
             'birth_date' => 'required|date|before:today|after:1900-01-01',
+            'photo' => 'nullable|image|max:2048',
         ]);
 
-        $student->update($request->all());
+        $data = $request->all();
+
+        // Upload da foto
+        if ($request->hasFile('photo')) {
+            // Remove foto antiga
+            if ($student->photo) {
+                Storage::disk('public')->delete($student->photo);
+            }
+            $data['photo'] = $request->file('photo')->store('students', 'public');
+        }
+
+        $student->update($data);
 
         return redirect()->route('students.index')
             ->with('success', 'Estudante atualizado com sucesso!');
@@ -105,6 +130,12 @@ class StudentController extends Controller
     public function forceDelete($id)
     {
         $student = Student::onlyTrashed()->findOrFail($id);
+
+        // Remove foto se existir
+        if ($student->photo) {
+            Storage::disk('public')->delete($student->photo);
+        }
+
         $student->forceDelete();
 
         return redirect()->route('students.trash')

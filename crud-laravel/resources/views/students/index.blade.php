@@ -19,6 +19,7 @@
         <table class="table table-bordered table-hover">
             <thead class="table-dark">
                 <tr>
+                    <th>Photo</th>
                     <th>Name</th>
                     <th>Email</th>
                     <th>Course</th>
@@ -31,11 +32,26 @@
             <tbody>
                 @foreach($students as $s)
                 <tr>
+                    <!-- Mostrar foto -->
+                    <td>
+                        @if(!empty($s->photo))
+                            <img src="{{ asset('storage/students/'.$s->photo) }}" alt="Student Photo" width="50">
+                        @else
+                            -
+                        @endif
+                    </td>
+
                     <td>{{ $s->name }}</td>
                     <td>{{ $s->email }}</td>
-                    <td>{{ $s->course }}</td>
+                    
+                    <!-- Usando relacionamento Course -->
+                    <td>{{ $s->course?->name ?? '-' }}</td>
+
                     <td>{{ $s->phone ?? '-' }}</td>
-                    <td>{{ $s->birth_date ? $s->birth_date->format('d/m/Y') : '-' }}</td>
+
+                    <!-- Formatação segura da data -->
+                    
+
                     <td>
                         <a href="{{ route('students.edit', $s) }}" class="btn btn-warning btn-sm">Edit</a>
 

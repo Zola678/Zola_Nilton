@@ -20,6 +20,7 @@ return new class extends Migration
         $table->date('birth_date')->nullable();
         $table->timestamps();
         $table->softDeletes(); // 🗑️ Lixeira
+        $table->string('photo')->nullable();
     });
     
 }
