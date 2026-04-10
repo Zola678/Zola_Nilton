@@ -19,68 +19,81 @@ class StudentController extends Controller
     // Formulário de criação
     public function create()
     {
-        $courses = Course::all();
+        // Cursos fixos
+        $courses = [
+            1 => 'Electrônica e Telecomunicações',
+            2 => 'Informática',
+            3 => 'Informática e Sistemas Multimídia'
+        ];
+
         return view('students.create', compact('courses'));
     }
 
     // Formulário de edição
     public function edit(Student $student)
     {
-        $courses = Course::all();
+        // Cursos fixos
+        $courses = [
+            1 => 'Electrônica e Telecomunicações',
+            2 => 'Informática',
+            3 => 'Informática e Sistemas Multimídia'
+        ];
+
         return view('students.edit', compact('student', 'courses'));
     }
 
- public function store(Request $request)
-{
-    $data = $request->validate([
-        'name' => 'required|string|max:255',
-        'email' => 'required|email|unique:students,email',
-        'course' => 'required|string',
-        'phone' => 'nullable|string',
-        'birth_date' => 'nullable|date',
-        'photo' => 'nullable|image|max:2048',
-    ]);
+    // Armazenar novo estudante
+    public function store(Request $request)
+    {
+        $data = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:students,email',
+            'course_id' => 'required|in:1,2,3', // IDs fixos
+            'phone' => 'nullable|string',
+            'birth_date' => 'nullable|date',
+            'photo' => 'nullable|image|max:2048',
+        ], [
+            'course_id.in' => 'Selecione um curso válido.',
+        ]);
 
-    // Upload da foto
-    if ($request->hasFile('photo')) {
-        $data['photo'] = $request->file('photo')->store('students', 'public');
-    }
-
-    Student::create($data);
-
-    return redirect()->route('students.index')
-        ->with('success', 'Estudante criado com sucesso!');
-}
-
-public function update(Request $request, Student $student)
-{
-    $request->validate([
-        'name' => 'required|string|max:255',
-        'email' => 'required|email|unique:students,email,' . $student->id,
-        'course' => 'required|string|in:Electrônica e Telecomunicações,Informática,Informática e Sistemas Multimídia',
-        'phone' => 'required|numeric|digits_between:9,15',
-        'birth_date' => 'required|date|before:today|after:1900-01-01',
-        'photo' => 'nullable|image|max:2048',
-    ], [
-        'course.in' => 'Selecione um curso válido.',
-    ]);
-
-    $data = $request->only(['name', 'email', 'course', 'phone', 'birth_date']);
-
-    // Upload da foto
-    if ($request->hasFile('photo')) {
-        // Remove foto antiga se existir
-        if ($student->photo) {
-            Storage::disk('public')->delete($student->photo);
+        // Upload da foto
+        if ($request->hasFile('photo')) {
+            $data['photo'] = $request->file('photo')->store('students', 'public');
         }
-        $data['photo'] = $request->file('photo')->store('students', 'public');
+
+        Student::create($data);
+
+        return redirect()->route('students.index')
+            ->with('success', 'Estudante criado com sucesso!');
     }
 
-    $student->update($data);
+    // Atualizar estudante existente
+    public function update(Request $request, Student $student)
+    {
+        $data = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:students,email,' . $student->id,
+            'course_id' => 'required|integer',
+            'phone' => 'required|numeric|digits_between:9,15',
+            'birth_date' => 'required|date|before:today|after:1900-01-01',
+            'photo' => 'nullable|image|max:2048',
+        ], [
+            'course_id.in' => 'Selecione um curso válido.',
+        ]);
 
-    return redirect()->route('students.index')
-        ->with('success', 'Estudante atualizado com sucesso!');
-}
+        // Upload da foto
+        if ($request->hasFile('photo')) {
+            if ($student->photo) {
+                Storage::disk('public')->delete($student->photo);
+            }
+            $data['photo'] = $request->file('photo')->store('students', 'public');
+        }
+
+        $student->update($data);
+
+        return redirect()->route('students.index')
+            ->with('success', 'Estudante atualizado com sucesso!');
+    }
 
     // Move para lixeira (soft delete)
     public function destroy(Student $student)
@@ -111,7 +124,6 @@ public function update(Request $request, Student $student)
     {
         $student = Student::onlyTrashed()->findOrFail($id);
 
-        // Remove foto se existir
         if ($student->photo) {
             Storage::disk('public')->delete($student->photo);
         }

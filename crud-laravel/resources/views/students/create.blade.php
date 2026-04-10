@@ -2,86 +2,94 @@
 
 @section('content')
 <div class="container">
-    <h2 class="my-4">{{ isset($student) ? 'Edit Student' : 'Add Student' }}</h2>
+    <h2 class="my-4">{{ isset($student) ? 'Editar Estudante' : 'Adicionar Estudante' }}</h2>
 
-    <form method="POST" action="{{ isset($student) ? route('students.update', $student) : route('students.store') }}" enctype="multipart/form-data">
+    <form method="POST" 
+          action="{{ isset($student) ? route('students.update', $student) : route('students.store') }}" 
+          enctype="multipart/form-data">
         @csrf
         @if(isset($student))
             @method('PUT')
         @endif
 
-        <!-- Name -->
-        <input type="text" name="name" value="{{ old('name', $student->name ?? '') }}" 
-               class="form-control mb-2 @error('name') is-invalid @enderror" placeholder="Name" required>
+        <!-- Nome -->
+        <input type="text" name="name" 
+               value="{{ old('name', $student->name ?? '') }}" 
+               class="form-control mb-2 @error('name') is-invalid @enderror" 
+               placeholder="Nome" required>
         @error('name')
             <div class="invalid-feedback">{{ $message }}</div>
         @enderror
 
         <!-- Email -->
-        <input type="email" name="email" value="{{ old('email', $student->email ?? '') }}" 
-               class="form-control mb-2 @error('email') is-invalid @enderror" placeholder="Email" required>
+        <input type="email" name="email" 
+               value="{{ old('email', $student->email ?? '') }}" 
+               class="form-control mb-2 @error('email') is-invalid @enderror" 
+               placeholder="Email" required>
         @error('email')
             <div class="invalid-feedback">{{ $message }}</div>
         @enderror
 
-        <!-- Course (SIMPLIFICADO E CORRETO) -->
+        <!-- Cursos fixos -->
         @php
-            $courses = [
-                'Electrônica e Telecomunicações',
-                'Informática',
-                'Informática e Sistemas Multimídia'
+            $fixedCourses = [
+                1 => 'Electrônica e Telecomunicações',
+                2 => 'Informática',
+                3 => 'Informática e Sistemas Multimídia'
             ];
-            $selected = old('course', $student->course ?? '');
+            $selected = old('course_id', $student->course_id ?? '');
         @endphp
-
-        <select name="course" class="form-control mb-2 @error('course') is-invalid @enderror" required>
-            <option value="">Select Course</option>
-            @foreach($courses as $course)
-                <option value="{{ $course }}" {{ $selected == $course ? 'selected' : '' }}>
-                    {{ $course }}
+        <select name="course_id" 
+                class="form-control mb-2 @error('course_id') is-invalid @enderror" 
+                required>
+            <option value="">Selecione o Curso</option>
+            @foreach($fixedCourses as $id => $name)
+                <option value="{{ $id }}" {{ $selected == $id ? 'selected' : '' }}>
+                    {{ $name }}
                 </option>
             @endforeach
         </select>
-
-        @error('course')
+        @error('course_id')
             <div class="invalid-feedback">{{ $message }}</div>
         @enderror
 
-        <!-- Phone -->
-        <input type="text" name="phone" value="{{ old('phone', $student->phone ?? '') }}" 
-               class="form-control mb-2 @error('phone') is-invalid @enderror" placeholder="Phone">
+        <!-- Telefone -->
+        <input type="text" name="phone" 
+               value="{{ old('phone', $student->phone ?? '') }}" 
+               class="form-control mb-2 @error('phone') is-invalid @enderror" 
+               placeholder="Telefone">
         @error('phone')
             <div class="invalid-feedback">{{ $message }}</div>
         @enderror
 
-        <!-- Birth Date (CORRIGIDO) -->
+        <!-- Data de nascimento -->
         <input type="date" 
                name="birth_date" 
-               value="{{ old('birth_date', isset($student->birth_date) ? date('Y-m-d', strtotime($student->birth_date)) : '') }}" 
+               value="{{ old('birth_date', isset($student->birth_date) ? \Carbon\Carbon::parse($student->birth_date)->format('Y-m-d') : '') }}" 
                class="form-control mb-2 @error('birth_date') is-invalid @enderror">
         @error('birth_date')
             <div class="invalid-feedback">{{ $message }}</div>
         @enderror
 
-        <!-- Photo Upload -->
-        <input type="file" name="photo" class="form-control mb-2 @error('photo') is-invalid @enderror" accept="image/*">
+        <!-- Foto -->
+        <input type="file" name="photo" 
+               class="form-control mb-2 @error('photo') is-invalid @enderror" 
+               accept="image/*">
         @error('photo')
             <div class="invalid-feedback">{{ $message }}</div>
         @enderror
 
-        <!-- Mostrar imagem atual -->
+        <!-- Mostrar foto atual -->
         @if(!empty($student->photo))
             <img src="{{ asset('storage/' . $student->photo) }}" 
-                 alt="Student Photo" 
-                 width="100" 
-                 class="mb-2">
+                 width="100" class="mb-2" alt="Foto do Estudante">
         @endif
 
+        <!-- Botões -->
         <button type="submit" class="btn btn-success">
-            {{ isset($student) ? 'Update' : 'Save' }}
+            {{ isset($student) ? 'Atualizar' : 'Salvar' }}
         </button>
-
-        <a href="{{ route('students.index') }}" class="btn btn-secondary">Back</a>
+        <a href="{{ route('students.index') }}" class="btn btn-secondary">Voltar</a>
     </form>
 </div>
 @endsection

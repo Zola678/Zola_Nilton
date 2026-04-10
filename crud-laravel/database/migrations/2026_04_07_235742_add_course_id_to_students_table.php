@@ -7,9 +7,11 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('students', function (Blueprint $table) {
-            $table->foreignId('course_id')->nullable()->constrained('courses')->onDelete('set null');
-        });
+       Schema::table('students', function (Blueprint $table) {
+    if (!Schema::hasColumn('students', 'course_id')) {
+        $table->foreignId('course_id')->nullable()->constrained('courses')->onDelete('set null');
+    }
+});
     }
 
     public function down(): void

@@ -13,10 +13,12 @@ class Student extends Model
     protected $fillable = [
         'name',
         'email',
+        'course_id',
         'phone',
         'birth_date',
-        'course',
-        'photo'
+        'photo',
+        'course'
+
     ];
 
     // transforma birth_date em Carbon automaticamente
